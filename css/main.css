@@ -168,10 +168,18 @@ body {
 /* Main Content */
 .main-content {
     flex: 1;
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
+}
+
+/* Top Actions */
+.top-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    justify-content: flex-end;
 }
 
 /* Section Styles */
@@ -194,6 +202,15 @@ body {
 /* Input Section */
 .input-section {
     margin-bottom: var(--spacing-xxl);
+}
+
+.input-section.compact {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-title.compact {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-md);
 }
 
 .lab-form {

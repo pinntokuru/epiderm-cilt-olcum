@@ -26,22 +26,23 @@
 <body>
     <!-- Main Application Container -->
     <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="header-icon">🔬</div>
-                <div class="header-text">
-                    <h1 class="app-title">Lab'dan ITA Dönüştürücü</h1>
-                    <p class="app-subtitle">Alexandrite Lazer Uygunluk Değerlendirmesi</p>
-                </div>
-            </div>
-        </header>
-
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Action Buttons -->
+            <div class="top-actions">
+                <button id="clear-history-btn" class="action-btn secondary small" disabled>
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Temizle</span>
+                </button>
+                <button id="new-measurement-btn" class="action-btn primary small">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">Yeni</span>
+                </button>
+            </div>
+
             <!-- Input Section -->
-            <section class="input-section" aria-labelledby="input-title">
-                <h2 id="input-title" class="section-title">
+            <section class="input-section compact" aria-labelledby="input-title">
+                <h2 id="input-title" class="section-title compact">
                     <span class="section-icon">📊</span>
                     Lab Değerlerini Girin
                 </h2>
@@ -160,16 +161,6 @@
                     </div>
                 </div>
                 
-                <div class="history-actions">
-                    <button id="clear-history-btn" class="action-btn secondary" disabled>
-                        <span class="btn-icon">🗑️</span>
-                        <span class="btn-text">Temizle</span>
-                    </button>
-                    <button id="new-measurement-btn" class="action-btn primary">
-                        <span class="btn-icon">➕</span>
-                        <span class="btn-text">Yeni</span>
-                    </button>
-                </div>
             </section>
         </main>
 

@@ -131,6 +131,18 @@
     overflow: hidden;
 }
 
+.action-btn.small {
+    min-height: 36px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    min-width: 80px;
+    gap: var(--spacing-xs);
+}
+
+.action-btn.small .btn-icon {
+    font-size: var(--font-size-sm);
+}
+
 .action-btn.primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
