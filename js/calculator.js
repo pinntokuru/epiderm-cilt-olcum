@@ -114,8 +114,24 @@ class ITACalculator {
 
             // Calculate ITA using the standard dermatological formula
             // ITA° = [Arc Tangent ((L* - 50) / b*)] × (180 / π)
-            const radians = Math.atan((lValue - 50) / bValue);
-            const itaValue = radians * (180 / Math.PI);
+            //
+            // Handle edge case: For very dark colors (L < 30) with negative b values,
+            // the standard formula can produce incorrect high positive ITA values.
+            // This occurs because both (L-50) and b are negative, resulting in a positive ratio.
+            let itaValue;
+            
+            if (lValue < 30 && bValue < 0) {
+                // For very dark colors with negative b, ensure ITA reflects the darkness
+                // Use the absolute value of b to maintain the correct mathematical relationship
+                // but ensure the result indicates dark skin tone
+                const ratio = (lValue - 50) / Math.abs(bValue);
+                const radians = Math.atan(ratio);
+                itaValue = radians * (180 / Math.PI);
+            } else {
+                // Standard calculation for normal cases
+                const radians = Math.atan((lValue - 50) / bValue);
+                itaValue = radians * (180 / Math.PI);
+            }
 
             // Round to 1 decimal place
             const roundedITA = Math.round(itaValue * 10) / 10;
