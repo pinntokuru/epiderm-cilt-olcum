@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lab değerlerini ITA değerine dönüştüren Alexandrite lazer uygunluk değerlendirme aracı">
+    <meta name="keywords" content="lab, ita, lazer epilasyon, cilt tipi, alexandrite, kolorimetre">
+    <meta name="author" content="Epiderm Color Converter">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2E86AB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Lab-ITA Dönüştürücü">
+    
+    <title>Lab'dan ITA Dönüştürücü - Alexandrite Lazer Uygunluk Değerlendirmesi</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJFODZBQiIvPgo8cGF0aCBkPSJNOCAxMkgxNlYyMEg4VjEyWiIgZmlsbD0id2hpdGUiLz4KPHA+dGggZD0iTTIwIDEySDI0VjIwSDIwVjEyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-icon">🔬</div>
+                <div class="header-text">
+                    <h1 class="app-title">Lab'dan ITA Dönüştürücü</h1>
+                    <p class="app-subtitle">Alexandrite Lazer Uygunluk Değerlendirmesi</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section" aria-labelledby="input-title">
+                <h2 id="input-title" class="section-title">
+                    <span class="section-icon">📊</span>
+                    Lab Değerlerini Girin
+                </h2>
+                
+                <form id="lab-form" class="lab-form" novalidate>
+                    <div class="input-group">
+                        <div class="input-field-container">
+                            <label for="l-value" class="input-label">L* (Parlaklık)</label>
+                            <input 
+                                type="number" 
+                                id="l-value" 
+                                name="lValue"
+                                class="input-field" 
+                                placeholder="0-100"
+                                min="0" 
+                                max="100" 
+                                step="0.1"
+                                aria-describedby="l-help l-error"
+                                required
+                            >
+                            <div id="l-help" class="input-help">Aralık: 0-100</div>
+                            <div id="l-error" class="error-message" role="alert" aria-live="polite"></div>
+                        </div>
+                        
+                        <div class="input-field-container">
+                            <label for="a-value" class="input-label">a* (Yeşil-Kırmızı)</label>
+                            <input 
+                                type="number" 
+                                id="a-value" 
+                                name="aValue"
+                                class="input-field" 
+                                placeholder="-128 ile +127"
+                                min="-128" 
+                                max="127" 
+                                step="0.1"
+                                aria-describedby="a-help a-error"
+                                required
+                            >
+                            <div id="a-help" class="input-help">Aralık: -128 ile +127</div>
+                            <div id="a-error" class="error-message" role="alert" aria-live="polite"></div>
+                        </div>
+                        
+                        <div class="input-field-container">
+                            <label for="b-value" class="input-label">b* (Mavi-Sarı)</label>
+                            <input 
+                                type="number" 
+                                id="b-value" 
+                                name="bValue"
+                                class="input-field" 
+                                placeholder="-128 ile +127"
+                                min="-128" 
+                                max="127" 
+                                step="0.1"
+                                aria-describedby="b-help b-error"
+                                required
+                            >
+                            <div id="b-help" class="input-help">Aralık: -128 ile +127</div>
+                            <div id="b-error" class="error-message" role="alert" aria-live="polite"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="calculate-btn" class="calculate-btn">
+                        <span class="btn-icon">🧮</span>
+                        <span class="btn-text">ITA Hesapla</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" aria-labelledby="results-title">
+                <h2 id="results-title" class="section-title">
+                    <span class="section-icon">📋</span>
+                    Sonuçlar
+                </h2>
+                
+                <div id="results-container" class="results-container" style="display: none;">
+                    <div class="result-card">
+                        <div class="result-values">
+                            <div class="ita-value">
+                                <span class="result-label">ITA Değeri:</span>
+                                <span id="ita-result" class="result-number">--</span>
+                            </div>
+                            <div class="skin-type">
+                                <span class="result-label">Cilt Tipi:</span>
+                                <span id="skin-type-result" class="result-text">--</span>
+                            </div>
+                        </div>
+                        
+                        <div id="suitability-indicator" class="suitability-indicator">
+                            <div class="indicator-content">
+                                <span class="indicator-icon">--</span>
+                                <span class="indicator-title">--</span>
+                                <span class="indicator-description">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-state" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <span class="loading-text">ITA hesaplanıyor...</span>
+                </div>
+            </section>
+
+            <!-- Measurement History Section -->
+            <section class="history-section" aria-labelledby="history-title">
+                <h2 id="history-title" class="section-title">
+                    <span class="section-icon">📝</span>
+                    Ölçüm Geçmişi
+                </h2>
+                
+                <div id="history-container" class="history-container">
+                    <div class="history-empty">
+                        <p class="empty-message">Henüz ölçüm yapılmadı</p>
+                    </div>
+                </div>
+                
+                <div class="history-actions">
+                    <button id="clear-history-btn" class="action-btn secondary" disabled>
+                        <span class="btn-icon">🗑️</span>
+                        <span class="btn-text">Temizle</span>
+                    </button>
+                    <button id="new-measurement-btn" class="action-btn primary">
+                        <span class="btn-icon">➕</span>
+                        <span class="btn-text">Yeni</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p class="footer-text">
+                Epiderm Color Converter &copy; 2024 - Alexandrite Lazer Uygunluk Değerlendirmesi
+            </p>
+        </footer>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal" style="display: none;" role="dialog" aria-labelledby="error-title" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="error-title" class="modal-title">Hata</h3>
+                <button id="close-error-modal" class="modal-close" aria-label="Kapat">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="error-message" class="error-text">Bir hata oluştu.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="error-ok-btn" class="btn primary">Tamam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/calculator.js"></script>
+    <script src="js/validator.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

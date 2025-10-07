@@ -1,0 +1,432 @@
+/* Lab to ITA Converter - Mobile Specific Styles */
+/* Enhanced Mobile Experience for Turkish Interface */
+
+/* Mobile Portrait (320px - 480px) */
+@media screen and (max-width: 480px) {
+    /* Enhanced touch targets for small screens */
+    .input-field {
+        min-height: 48px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .calculate-btn {
+        min-height: 48px;
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    /* Adjust spacing for small screens */
+    .main-content {
+        padding: var(--spacing-md);
+    }
+    
+    .app-header {
+        padding: var(--spacing-md);
+    }
+    
+    .header-content {
+        gap: var(--spacing-sm);
+    }
+    
+    .app-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .app-subtitle {
+        font-size: var(--font-size-xs);
+    }
+    
+    /* Single column layout for very small screens */
+    .input-group {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .result-values {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    /* Compact result display */
+    .ita-value,
+    .skin-type {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+        text-align: left;
+    }
+    
+    .result-number,
+    .result-text {
+        font-size: var(--font-size-lg);
+    }
+    
+    /* Adjust indicator for small screens */
+    .indicator-icon {
+        font-size: var(--font-size-xxl);
+    }
+    
+    .indicator-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .indicator-description {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Mobile Landscape (481px - 768px) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    /* Two-column input layout for landscape */
+    .input-group {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    /* Third input spans full width */
+    .input-field-container:nth-child(3) {
+        grid-column: 1 / -1;
+    }
+    
+    /* Side-by-side result values */
+    .result-values {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    /* Horizontal indicator layout */
+    .indicator-content {
+        flex-direction: row;
+        gap: var(--spacing-md);
+        text-align: left;
+    }
+    
+    .indicator-icon {
+        font-size: var(--font-size-xxxl);
+        flex-shrink: 0;
+    }
+    
+    .indicator-text {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+}
+
+/* Tablet Portrait (769px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .app-container {
+        max-width: 700px;
+    }
+    
+    .main-content {
+        padding: var(--spacing-xl) var(--spacing-lg);
+    }
+    
+    /* Three-column input layout */
+    .input-group {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-lg);
+    }
+    
+    /* Enhanced result display */
+    .result-values {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .result-card {
+        padding: var(--spacing-xl);
+    }
+    
+    /* Larger touch targets */
+    .input-field {
+        min-height: 52px;
+        font-size: var(--font-size-lg);
+    }
+    
+    .calculate-btn {
+        min-height: 52px;
+        font-size: var(--font-size-lg);
+    }
+}
+
+/* Large Screens (1025px+) */
+@media screen and (min-width: 1025px) {
+    .app-container {
+        max-width: 800px;
+    }
+    
+    .main-content {
+        padding: var(--spacing-xxl) var(--spacing-xl);
+    }
+    
+    /* Enhanced desktop layout */
+    .input-group {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-xl);
+    }
+    
+    .lab-form {
+        padding: var(--spacing-xl);
+    }
+    
+    .result-card {
+        padding: var(--spacing-xxl);
+    }
+    
+    /* Hover effects for desktop */
+    .input-field:hover {
+        border-color: var(--primary-light);
+    }
+    
+    .calculate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+}
+
+/* Touch-specific enhancements */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .calculate-btn:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .input-field:hover {
+        border-color: var(--border-color);
+    }
+    
+    /* Enhanced touch feedback */
+    .calculate-btn:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease-in-out;
+    }
+    
+    .input-field:focus {
+        transform: scale(1.02);
+        transition: transform var(--transition-fast);
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* Sharper borders and shadows */
+    .input-field,
+    .calculate-btn,
+    .results-container {
+        border-width: 0.5px;
+    }
+    
+    .suitability-indicator {
+        border-width: 1px;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .loading-spinner {
+        animation: none;
+        border-top-color: var(--primary-color);
+    }
+}
+
+/* Dark mode support (if system preference) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1a1a1a;
+        --surface-color: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+        --text-muted: #808080;
+        --border-color: #404040;
+        
+        /* Adjust status colors for dark mode */
+        --success-light: rgba(24, 165, 88, 0.2);
+        --warning-light: rgba(243, 156, 18, 0.2);
+        --danger-light: rgba(231, 76, 60, 0.2);
+    }
+    
+    .app-header {
+        background: linear-gradient(135deg, #1E5F7A 0%, #0F3A4A 100%);
+    }
+    
+    .input-field {
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+    }
+    
+    .input-field::placeholder {
+        color: var(--text-muted);
+    }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    /* Compact header for landscape on small screens */
+    .app-header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .app-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .app-subtitle {
+        display: none;
+    }
+    
+    .main-content {
+        padding: var(--spacing-md);
+    }
+    
+    .section-title {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    /* Horizontal layout for landscape */
+    .input-group {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-sm);
+    }
+    
+    .result-values {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .indicator-content {
+        flex-direction: row;
+        gap: var(--spacing-md);
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* Fix for iOS Safari viewport units */
+    .app-container {
+        min-height: -webkit-fill-available;
+    }
+    
+    /* Prevent zoom on input focus */
+    .input-field {
+        font-size: 16px;
+    }
+    
+    /* Fix for iOS Safari button styling */
+    .calculate-btn {
+        -webkit-appearance: none;
+        border-radius: var(--border-radius-md);
+    }
+    
+    /* Smooth scrolling for iOS */
+    .main-content {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* Fix for Android Chrome input styling */
+    .input-field::-webkit-outer-spin-button,
+    .input-field::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    .input-field[type=number] {
+        -moz-appearance: textfield;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000000;
+        --text-primary: #000000;
+        --text-secondary: #000000;
+    }
+    
+    .input-field {
+        border-width: 2px;
+        border-color: #000000;
+    }
+    
+    .calculate-btn {
+        border: 2px solid #000000;
+    }
+    
+    .suitability-indicator {
+        border-width: 3px;
+    }
+}
+
+/* Focus management for keyboard navigation */
+@media (hover: hover) and (pointer: fine) {
+    /* Enhanced focus styles for keyboard users */
+    .input-field:focus,
+    .calculate-btn:focus {
+        outline: 3px solid var(--border-focus);
+        outline-offset: 2px;
+    }
+    
+    /* Skip to main content link */
+    .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary-color);
+        color: var(--text-white);
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1000;
+    }
+    
+    .skip-link:focus {
+        top: 6px;
+    }
+}
+
+/* Print optimizations for mobile */
+@media print {
+    @page {
+        margin: 1cm;
+        size: A4 portrait;
+    }
+    
+    .app-container {
+        min-height: auto;
+    }
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    .input-group {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1cm;
+        page-break-inside: avoid;
+    }
+    
+    .results-container {
+        page-break-inside: avoid;
+        margin-top: 1cm;
+    }
+    
+    .suitability-indicator {
+        border: 2px solid #000;
+        background: none !important;
+        color: #000 !important;
+    }
+}
