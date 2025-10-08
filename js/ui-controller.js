@@ -67,8 +67,6 @@ class UIController {
             resultsContainer: document.getElementById('results-container'),
             loadingState: document.getElementById('loading-state'),
             itaResult: document.getElementById('ita-result'),
-            skinTypeResult: document.getElementById('skin-type-result'),
-            suitabilityIndicator: document.getElementById('suitability-indicator'),
             
             // History elements
             historyContainer: document.getElementById('history-container'),
@@ -282,16 +280,10 @@ class UIController {
      * @param {Object} result - Calculation result
      */
     displayResults(result) {
-        const { ita, skinType } = result;
+        const { ita } = result;
         
         // Update ITA value
         this.elements.itaResult.textContent = this.calculator.formatITAValue(ita);
-        
-        // Update skin type
-        this.elements.skinTypeResult.textContent = skinType.fullDescription;
-        
-        // Update suitability indicator
-        this.updateSuitabilityIndicator(skinType);
         
         // Show results with animation
         this.elements.resultsContainer.style.display = 'block';
@@ -301,26 +293,6 @@ class UIController {
         this.announceResults(result);
     }
 
-    /**
-     * Update suitability indicator
-     * @param {Object} skinType - Skin type information
-     */
-    updateSuitabilityIndicator(skinType) {
-        const indicator = this.elements.suitabilityIndicator;
-        const message = skinType.suitabilityMessage;
-        
-        // Clear existing classes
-        indicator.className = 'suitability-indicator';
-        indicator.classList.add(message.className);
-        
-        // Update content
-        const content = indicator.querySelector('.indicator-content');
-        content.innerHTML = `
-            <span class="indicator-icon">${message.icon}</span>
-            <span class="indicator-title">${message.title}</span>
-            <span class="indicator-description">${message.description.replace('\n', '<br>')}</span>
-        `;
-    }
 
     /**
      * Show loading state
@@ -443,22 +415,19 @@ class UIController {
      * @returns {string} HTML string
      */
     createHistoryItemHTML(item, index) {
-        const summary = this.calculator.generateSummary(item);
-        const timeString = item.timestamp.toLocaleTimeString('tr-TR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        const timeString = item.timestamp.toLocaleTimeString('tr-TR', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
+        
+        const itaFormatted = this.calculator.formatITAValue(item.ita);
         
         return `
             <div class="history-item" data-id="${item.id}">
                 <div class="history-item-content">
-                    <div class="history-item-values">${index}. ${summary}</div>
-                    <div class="history-item-result">
-                        ${item.skinType.fullDescription} - ${item.skinType.recommendation}
-                    </div>
+                    <div class="history-item-values">${index}. L:${item.labValues.L} a:${item.labValues.a} b:${item.labValues.b} → ITA:${itaFormatted}</div>
                 </div>
                 <div class="history-item-timestamp">${timeString}</div>
-                <div class="history-item-status ${item.skinType.suitability}"></div>
             </div>
         `;
     }
@@ -508,10 +477,9 @@ class UIController {
         if (this.elements.resultsContainer.style.display === 'none') return;
         
         const itaValue = this.elements.itaResult.textContent;
-        const skinType = this.elements.skinTypeResult.textContent;
         const formData = this.getFormData();
         
-        const textToCopy = `Lab Değerleri: L*:${formData.lValue} a*:${formData.aValue} b*:${formData.bValue}\nITA: ${itaValue}\nCilt Tipi: ${skinType}`;
+        const textToCopy = `Lab Değerleri: L*:${formData.lValue} a*:${formData.aValue} b*:${formData.bValue}\nITA: ${itaValue}`;
         
         try {
             await navigator.clipboard.writeText(textToCopy);
@@ -604,7 +572,7 @@ class UIController {
      * @param {Object} result - Calculation result
      */
     announceResults(result) {
-        const announcement = `ITA değeri ${this.calculator.formatITAValue(result.ita)}, ${result.skinType.fullDescription}, ${result.skinType.suitabilityMessage.title}`;
+        const announcement = `ITA değeri ${this.calculator.formatITAValue(result.ita)}`;
         
         // Create temporary element for screen reader announcement
         const announcer = document.createElement('div');
