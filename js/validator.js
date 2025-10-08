@@ -12,7 +12,6 @@ class InputValidator {
             outOfRange: 'Değer geçerli aralık dışında',
             lStarRange: 'L* değeri 0 ile 100 arasında olmalıdır',
             bStarRange: 'b* değeri -128 ile 127 arasında olmalıdır',
-            bStarZero: 'b* değeri sıfır olamaz (sıfıra bölme hatası)',
             tooManyDecimals: 'En fazla 2 ondalık basamak kullanın',
             negativeNotAllowed: 'Negatif değer giremezsiniz',
             positiveNotAllowed: 'Pozitif değer giremezsiniz'
@@ -20,6 +19,7 @@ class InputValidator {
 
         // Validation rules for each field
         this.rules = {
+            // Legacy single measurement fields (for backward compatibility)
             lValue: {
                 required: true,
                 type: 'number',
@@ -34,8 +34,56 @@ class InputValidator {
                 min: -128,
                 max: 127,
                 decimals: 2,
-                allowNegative: true,
-                notZero: true
+                allowNegative: true
+            },
+            // Multiple measurement fields
+            lValue1: {
+                required: true,
+                type: 'number',
+                min: 0,
+                max: 100,
+                decimals: 2,
+                allowNegative: false
+            },
+            bValue1: {
+                required: true,
+                type: 'number',
+                min: -128,
+                max: 127,
+                decimals: 2,
+                allowNegative: true
+            },
+            lValue2: {
+                required: false,
+                type: 'number',
+                min: 0,
+                max: 100,
+                decimals: 2,
+                allowNegative: false
+            },
+            bValue2: {
+                required: false,
+                type: 'number',
+                min: -128,
+                max: 127,
+                decimals: 2,
+                allowNegative: true
+            },
+            lValue3: {
+                required: false,
+                type: 'number',
+                min: 0,
+                max: 100,
+                decimals: 2,
+                allowNegative: false
+            },
+            bValue3: {
+                required: false,
+                type: 'number',
+                min: -128,
+                max: 127,
+                decimals: 2,
+                allowNegative: true
             }
         };
 
@@ -124,16 +172,128 @@ class InputValidator {
             errors.push(this.getFieldSpecificRangeMessage(fieldName));
         }
 
-        // Check for zero if not allowed
-        if (rule.notZero && numValue === 0) {
-            errors.push(this.messages.bStarZero);
-        }
 
         return {
             isValid: errors.length === 0,
             errors: errors,
             numericValue: numValue
         };
+    }
+
+    /**
+     * Validate multiple measurements form data
+     * @param {Object} formData - Object containing all form field values
+     * @returns {Object} Complete validation result for multiple measurements
+     */
+    validateMultipleMeasurements(formData) {
+        const results = {};
+        const allErrors = [];
+        let isFormValid = true;
+        const validMeasurements = [];
+
+        // Check each measurement (1, 2, 3)
+        for (let i = 1; i <= 3; i++) {
+            const lFieldName = `lValue${i}`;
+            const bFieldName = `bValue${i}`;
+            const lValue = formData[lFieldName];
+            const bValue = formData[bFieldName];
+
+            // For measurement 1, both fields are required
+            // For measurements 2 and 3, if one field is filled, both must be filled
+            const hasLValue = lValue !== null && lValue !== undefined && lValue !== '';
+            const hasBValue = bValue !== null && bValue !== undefined && bValue !== '';
+
+            if (i === 1) {
+                // First measurement is required
+                const lResult = this.validateField(lFieldName, lValue);
+                const bResult = this.validateField(bFieldName, bValue);
+                
+                results[lFieldName] = lResult;
+                results[bFieldName] = bResult;
+                
+                if (!lResult.isValid || !bResult.isValid) {
+                    isFormValid = false;
+                    if (!lResult.isValid) allErrors.push(...lResult.errors);
+                    if (!bResult.isValid) allErrors.push(...bResult.errors);
+                } else {
+                    validMeasurements.push({
+                        L: parseFloat(lValue),
+                        b: parseFloat(bValue),
+                        measurementNumber: i
+                    });
+                }
+            } else {
+                // Optional measurements (2 and 3)
+                if (hasLValue || hasBValue) {
+                    // If either field has a value, both must be valid
+                    const lResult = this.validateField(lFieldName, lValue);
+                    const bResult = this.validateField(bFieldName, bValue);
+                    
+                    // Override required validation for optional measurements
+                    if (!hasLValue) {
+                        lResult.isValid = false;
+                        lResult.errors = [`Ölçüm ${i} için L* değeri gereklidir`];
+                    }
+                    if (!hasBValue) {
+                        bResult.isValid = false;
+                        bResult.errors = [`Ölçüm ${i} için b* değeri gereklidir`];
+                    }
+                    
+                    results[lFieldName] = lResult;
+                    results[bFieldName] = bResult;
+                    
+                    if (!lResult.isValid || !bResult.isValid) {
+                        isFormValid = false;
+                        if (!lResult.isValid) allErrors.push(...lResult.errors);
+                        if (!bResult.isValid) allErrors.push(...bResult.errors);
+                    } else {
+                        validMeasurements.push({
+                            L: parseFloat(lValue),
+                            b: parseFloat(bValue),
+                            measurementNumber: i
+                        });
+                    }
+                } else {
+                    // Both fields are empty, which is valid for optional measurements
+                    results[lFieldName] = { isValid: true, errors: [], value: '' };
+                    results[bFieldName] = { isValid: true, errors: [], value: '' };
+                }
+            }
+        }
+
+        return {
+            isValid: isFormValid,
+            fields: results,
+            errors: allErrors,
+            hasErrors: allErrors.length > 0,
+            validMeasurements: validMeasurements,
+            measurementCount: validMeasurements.length
+        };
+    }
+
+    /**
+     * Check if a measurement pair is complete (both L and b values provided)
+     * @param {string} lValue - L* value
+     * @param {string} bValue - b* value
+     * @returns {boolean} True if both values are provided
+     */
+    isMeasurementComplete(lValue, bValue) {
+        const hasL = lValue !== null && lValue !== undefined && lValue !== '';
+        const hasB = bValue !== null && bValue !== undefined && bValue !== '';
+        return hasL && hasB;
+    }
+
+    /**
+     * Get validation message for measurement pairs
+     * @param {number} measurementNumber - Measurement number (1, 2, or 3)
+     * @returns {string} Validation message
+     */
+    getMeasurementPairMessage(measurementNumber) {
+        if (measurementNumber === 1) {
+            return 'İlk ölçüm zorunludur - hem L* hem de b* değerlerini girin';
+        } else {
+            return `Ölçüm ${measurementNumber} için hem L* hem de b* değerlerini girin veya her ikisini de boş bırakın`;
+        }
     }
 
     /**
@@ -341,7 +501,7 @@ class InputValidator {
             case 'lValue':
                 return 'Aralık: 0-100';
             case 'bValue':
-                return 'Aralık: -128 ile +127 (sıfır olamaz)';
+                return 'Aralık: -128 ile +127';
             default:
                 return '';
         }

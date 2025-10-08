@@ -53,18 +53,30 @@ class UIController {
         this.elements = {
             // Form elements
             form: document.getElementById('lab-form'),
-            lValue: document.getElementById('l-value'),
-            bValue: document.getElementById('b-value'),
             calculateBtn: document.getElementById('calculate-btn'),
             
-            // Error elements
-            lError: document.getElementById('l-error'),
-            bError: document.getElementById('b-error'),
+            // Multiple measurement input elements
+            lValue1: document.getElementById('l-value-1'),
+            bValue1: document.getElementById('b-value-1'),
+            lValue2: document.getElementById('l-value-2'),
+            bValue2: document.getElementById('b-value-2'),
+            lValue3: document.getElementById('l-value-3'),
+            bValue3: document.getElementById('b-value-3'),
+            
+            // Error elements for multiple measurements
+            lError1: document.getElementById('l-error-1'),
+            bError1: document.getElementById('b-error-1'),
+            lError2: document.getElementById('l-error-2'),
+            bError2: document.getElementById('b-error-2'),
+            lError3: document.getElementById('l-error-3'),
+            bError3: document.getElementById('b-error-3'),
             
             // Results elements
             resultsContainer: document.getElementById('results-container'),
             loadingState: document.getElementById('loading-state'),
-            itaResult: document.getElementById('ita-result'),
+            individualMeasurements: document.getElementById('individual-measurements'),
+            itaAverage: document.getElementById('ita-average'),
+            measurementCount: document.getElementById('measurement-count'),
             
             // History elements
             historyContainer: document.getElementById('history-container'),
@@ -86,13 +98,18 @@ class UIController {
         // Form submission
         this.elements.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
         
-        // Real-time input validation
-        this.elements.lValue.addEventListener('input', (e) => this.handleInputChange(e, 'lValue'));
-        this.elements.bValue.addEventListener('input', (e) => this.handleInputChange(e, 'bValue'));
-        
-        // Input sanitization
-        this.elements.lValue.addEventListener('blur', (e) => this.handleInputBlur(e, 'lValue'));
-        this.elements.bValue.addEventListener('blur', (e) => this.handleInputBlur(e, 'bValue'));
+        // Real-time input validation for all measurements
+        for (let i = 1; i <= 3; i++) {
+            const lFieldName = `lValue${i}`;
+            const bFieldName = `bValue${i}`;
+            
+            this.elements[lFieldName].addEventListener('input', (e) => this.handleInputChange(e, lFieldName));
+            this.elements[bFieldName].addEventListener('input', (e) => this.handleInputChange(e, bFieldName));
+            
+            // Input sanitization
+            this.elements[lFieldName].addEventListener('blur', (e) => this.handleInputBlur(e, lFieldName));
+            this.elements[bFieldName].addEventListener('blur', (e) => this.handleInputBlur(e, bFieldName));
+        }
         
         // History actions
         this.elements.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
@@ -164,14 +181,14 @@ class UIController {
         if (this.isCalculating) return;
         
         const formData = this.getFormData();
-        const validation = this.validator.validateForm(formData);
+        const validation = this.validator.validateMultipleMeasurements(formData);
         
         if (!validation.isValid) {
             this.displayValidationErrors(validation);
             return;
         }
         
-        await this.calculateITA(formData);
+        await this.calculateMultipleITA(validation.validMeasurements);
     }
 
     /**
@@ -228,8 +245,12 @@ class UIController {
      */
     getFormData() {
         return {
-            lValue: this.elements.lValue.value,
-            bValue: this.elements.bValue.value
+            lValue1: this.elements.lValue1.value,
+            bValue1: this.elements.bValue1.value,
+            lValue2: this.elements.lValue2.value,
+            bValue2: this.elements.bValue2.value,
+            lValue3: this.elements.lValue3.value,
+            bValue3: this.elements.bValue3.value
         };
     }
 
@@ -237,7 +258,7 @@ class UIController {
      * Calculate ITA value
      * @param {Object} formData - Form data
      */
-    async calculateITA(formData) {
+    async calculateMultipleITA(measurements) {
         this.isCalculating = true;
         this.showLoadingState();
         this.setCalculateButtonState(true);
@@ -246,13 +267,10 @@ class UIController {
             // Simulate calculation delay for better UX
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            const result = this.calculator.calculateITA(
-                formData.lValue,
-                formData.bValue
-            );
+            const result = this.calculator.calculateMultipleITA(measurements);
             
             if (result.success) {
-                this.displayResults(result);
+                this.displayMultipleResults(result);
                 this.addToHistory(result);
                 this.saveToLocalStorage();
             } else {
@@ -260,7 +278,7 @@ class UIController {
             }
             
         } catch (error) {
-            console.error('Calculation error:', error);
+            console.error('Multiple calculation error:', error);
             this.showErrorModal(this.uiText.calculationError);
         } finally {
             this.isCalculating = false;
@@ -270,21 +288,56 @@ class UIController {
     }
 
     /**
-     * Display calculation results
-     * @param {Object} result - Calculation result
+     * Display multiple measurement results
+     * @param {Object} result - Multiple calculation result
      */
-    displayResults(result) {
-        const { ita } = result;
+    displayMultipleResults(result) {
+        const { individualResults, averageITA, measurementCount } = result;
         
-        // Update ITA value
-        this.elements.itaResult.textContent = this.calculator.formatITAValue(ita);
+        // Display individual measurements
+        this.displayIndividualMeasurements(individualResults);
+        
+        // Update average ITA value
+        this.elements.itaAverage.textContent = this.calculator.formatITAValue(averageITA);
+        
+        // Update measurement count
+        this.elements.measurementCount.textContent = measurementCount;
         
         // Show results with animation
         this.elements.resultsContainer.style.display = 'block';
         this.elements.resultsContainer.classList.add('slide-up');
         
         // Announce to screen readers
-        this.announceResults(result);
+        this.announceMultipleResults(result);
+    }
+
+    /**
+     * Display individual measurement results
+     * @param {Array} individualResults - Array of individual measurement results
+     */
+    displayIndividualMeasurements(individualResults) {
+        const container = this.elements.individualMeasurements;
+        
+        const measurementsHTML = individualResults.map(result => {
+            const { measurementNumber, ita, labValues, success } = result;
+            const itaFormatted = success ? this.calculator.formatITAValue(ita) : 'Hata';
+            const statusClass = success ? 'success' : 'error';
+            
+            return `
+                <div class="individual-measurement ${statusClass}">
+                    <div class="measurement-header">
+                        <span class="measurement-number">${measurementNumber}.</span>
+                        <span class="measurement-values">L:${labValues.L} b:${labValues.b}</span>
+                    </div>
+                    <div class="measurement-result">
+                        <span class="ita-label">ITA:</span>
+                        <span class="ita-value">${itaFormatted}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = measurementsHTML;
     }
 
 
@@ -323,17 +376,29 @@ class UIController {
      * @param {Object} result - Validation result
      */
     displayFieldValidation(fieldName, result) {
-        const errorElement = this.elements[`${fieldName.charAt(0)}Error`];
+        // Handle both old and new field naming conventions
+        let errorElementId;
+        if (fieldName.includes('Value')) {
+            // New naming: lValue1 -> lError1, bValue2 -> bError2, etc.
+            errorElementId = fieldName.replace('Value', 'Error');
+        } else {
+            // Legacy naming: lValue -> lError, bValue -> bError
+            errorElementId = `${fieldName.charAt(0)}Error`;
+        }
+        
+        const errorElement = this.elements[errorElementId];
         const inputElement = this.elements[fieldName];
         
-        if (result.isValid) {
-            errorElement.textContent = '';
-            inputElement.classList.remove('invalid');
-            inputElement.classList.add('valid');
-        } else {
-            errorElement.textContent = result.errors[0] || '';
-            inputElement.classList.remove('valid');
-            inputElement.classList.add('invalid');
+        if (errorElement && inputElement) {
+            if (result.isValid) {
+                errorElement.textContent = '';
+                inputElement.classList.remove('invalid');
+                inputElement.classList.add('valid');
+            } else {
+                errorElement.textContent = result.errors[0] || '';
+                inputElement.classList.remove('valid');
+                inputElement.classList.add('invalid');
+            }
         }
     }
 
@@ -448,20 +513,37 @@ class UIController {
         // Clear form
         this.elements.form.reset();
         
-        // Clear validation states
-        ['lValue', 'bValue'].forEach(fieldName => {
-            const inputElement = this.elements[fieldName];
-            const errorElement = this.elements[`${fieldName.charAt(0)}Error`];
+        // Clear validation states for all measurement fields
+        for (let i = 1; i <= 3; i++) {
+            const lFieldName = `lValue${i}`;
+            const bFieldName = `bValue${i}`;
+            const lErrorName = `lError${i}`;
+            const bErrorName = `bError${i}`;
             
-            inputElement.classList.remove('valid', 'invalid');
-            errorElement.textContent = '';
-        });
+            const lInputElement = this.elements[lFieldName];
+            const bInputElement = this.elements[bFieldName];
+            const lErrorElement = this.elements[lErrorName];
+            const bErrorElement = this.elements[bErrorName];
+            
+            if (lInputElement) {
+                lInputElement.classList.remove('valid', 'invalid');
+            }
+            if (bInputElement) {
+                bInputElement.classList.remove('valid', 'invalid');
+            }
+            if (lErrorElement) {
+                lErrorElement.textContent = '';
+            }
+            if (bErrorElement) {
+                bErrorElement.textContent = '';
+            }
+        }
         
         // Hide results
         this.elements.resultsContainer.style.display = 'none';
         
         // Focus first input
-        this.elements.lValue.focus();
+        this.elements.lValue1.focus();
     }
 
     /**
@@ -470,10 +552,23 @@ class UIController {
     async copyResults() {
         if (this.elements.resultsContainer.style.display === 'none') return;
         
-        const itaValue = this.elements.itaResult.textContent;
+        const averageITA = this.elements.itaAverage.textContent;
+        const measurementCount = this.elements.measurementCount.textContent;
         const formData = this.getFormData();
         
-        const textToCopy = `Lab Değerleri: L*:${formData.lValue} b*:${formData.bValue}\nITA: ${itaValue}`;
+        let textToCopy = `Çoklu Ölçüm Sonuçları:\n`;
+        textToCopy += `Ölçüm Sayısı: ${measurementCount}\n`;
+        textToCopy += `Ortalama ITA: ${averageITA}\n\n`;
+        textToCopy += `Bireysel Ölçümler:\n`;
+        
+        // Add individual measurements
+        for (let i = 1; i <= 3; i++) {
+            const lValue = formData[`lValue${i}`];
+            const bValue = formData[`bValue${i}`];
+            if (lValue && bValue) {
+                textToCopy += `${i}. L*:${lValue} b*:${bValue}\n`;
+            }
+        }
         
         try {
             await navigator.clipboard.writeText(textToCopy);
@@ -620,6 +715,28 @@ class UIController {
         } catch (error) {
             console.warn('Failed to load from localStorage:', error);
         }
+    }
+
+    /**
+     * Announce multiple results to screen readers
+     * @param {Object} result - Multiple calculation result
+     */
+    announceMultipleResults(result) {
+        const { averageITA, measurementCount } = result;
+        const announcement = `${measurementCount} ölçüm tamamlandı. Ortalama ITA değeri ${this.calculator.formatITAValue(averageITA)}`;
+        
+        // Create temporary element for screen reader announcement
+        const announcer = document.createElement('div');
+        announcer.setAttribute('aria-live', 'assertive');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.className = 'visually-hidden';
+        announcer.textContent = announcement;
+        
+        document.body.appendChild(announcer);
+        
+        setTimeout(() => {
+            document.body.removeChild(announcer);
+        }, 1000);
     }
 }
 

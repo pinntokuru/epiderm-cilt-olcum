@@ -42,47 +42,135 @@
 
             <!-- Input Section -->
             <section class="input-section compact" aria-labelledby="input-title">
-                <h2 id="input-title" class="section-title compact">
-                    <span class="section-icon">📊</span>
-                    Lab Değerlerini Girin
-                </h2>
-                
                 <form id="lab-form" class="lab-form" novalidate>
-                    <div class="input-group">
-                        <div class="input-field-container">
-                            <label for="l-value" class="input-label">L* (Parlaklık)</label>
-                            <input 
-                                type="number" 
-                                id="l-value" 
-                                name="lValue"
-                                class="input-field" 
-                                placeholder="0-100"
-                                min="0" 
-                                max="100" 
-                                step="0.1"
-                                aria-describedby="l-help l-error"
-                                required
-                            >
-                            <div id="l-help" class="input-help">Aralık: 0-100</div>
-                            <div id="l-error" class="error-message" role="alert" aria-live="polite"></div>
+                    <!-- Measurement 1 (Required) -->
+                    <div class="measurement-group" data-measurement="1">
+                        <h3 class="measurement-title">
+                            <span class="measurement-number">1.</span>
+                            <span class="measurement-label">Ölçüm</span>
+                        </h3>
+                        <div class="input-group">
+                            <div class="input-field-container">
+                                <label for="l-value-1" class="input-label">L* (Parlaklık)</label>
+                                <input
+                                    type="number"
+                                    id="l-value-1"
+                                    name="lValue1"
+                                    class="input-field"
+                                    placeholder="0-100"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    aria-describedby="l-help-1 l-error-1"
+                                    required
+                                >
+                                <div id="l-help-1" class="input-help">Aralık: 0-100</div>
+                                <div id="l-error-1" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
+                            
+                            <div class="input-field-container">
+                                <label for="b-value-1" class="input-label">b* (Mavi-Sarı)</label>
+                                <input
+                                    type="number"
+                                    id="b-value-1"
+                                    name="bValue1"
+                                    class="input-field"
+                                    placeholder="-128 ile +127"
+                                    min="-128"
+                                    max="127"
+                                    step="0.1"
+                                    aria-describedby="b-help-1 b-error-1"
+                                    required
+                                >
+                                <div id="b-help-1" class="input-help">Aralık: -128 ile +127</div>
+                                <div id="b-error-1" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
                         </div>
-                        
-                        <div class="input-field-container">
-                            <label for="b-value" class="input-label">b* (Mavi-Sarı)</label>
-                            <input 
-                                type="number" 
-                                id="b-value" 
-                                name="bValue"
-                                class="input-field" 
-                                placeholder="-128 ile +127"
-                                min="-128" 
-                                max="127" 
-                                step="0.1"
-                                aria-describedby="b-help b-error"
-                                required
-                            >
-                            <div id="b-help" class="input-help">Aralık: -128 ile +127</div>
-                            <div id="b-error" class="error-message" role="alert" aria-live="polite"></div>
+                    </div>
+
+                    <!-- Measurement 2 (Optional) -->
+                    <div class="measurement-group" data-measurement="2">
+                        <h3 class="measurement-title">
+                            <span class="measurement-number">2.</span>
+                            <span class="measurement-label">Ölçüm</span>
+                        </h3>
+                        <div class="input-group">
+                            <div class="input-field-container">
+                                <label for="l-value-2" class="input-label">L* (Parlaklık)</label>
+                                <input
+                                    type="number"
+                                    id="l-value-2"
+                                    name="lValue2"
+                                    class="input-field"
+                                    placeholder="0-100"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    aria-describedby="l-help-2 l-error-2"
+                                >
+                                <div id="l-help-2" class="input-help">Aralık: 0-100</div>
+                                <div id="l-error-2" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
+                            
+                            <div class="input-field-container">
+                                <label for="b-value-2" class="input-label">b* (Mavi-Sarı)</label>
+                                <input
+                                    type="number"
+                                    id="b-value-2"
+                                    name="bValue2"
+                                    class="input-field"
+                                    placeholder="-128 ile +127"
+                                    min="-128"
+                                    max="127"
+                                    step="0.1"
+                                    aria-describedby="b-help-2 b-error-2"
+                                >
+                                <div id="b-help-2" class="input-help">Aralık: -128 ile +127</div>
+                                <div id="b-error-2" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Measurement 3 (Optional) -->
+                    <div class="measurement-group" data-measurement="3">
+                        <h3 class="measurement-title">
+                            <span class="measurement-number">3.</span>
+                            <span class="measurement-label">Ölçüm</span>
+                        </h3>
+                        <div class="input-group">
+                            <div class="input-field-container">
+                                <label for="l-value-3" class="input-label">L* (Parlaklık)</label>
+                                <input
+                                    type="number"
+                                    id="l-value-3"
+                                    name="lValue3"
+                                    class="input-field"
+                                    placeholder="0-100"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    aria-describedby="l-help-3 l-error-3"
+                                >
+                                <div id="l-help-3" class="input-help">Aralık: 0-100</div>
+                                <div id="l-error-3" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
+                            
+                            <div class="input-field-container">
+                                <label for="b-value-3" class="input-label">b* (Mavi-Sarı)</label>
+                                <input
+                                    type="number"
+                                    id="b-value-3"
+                                    name="bValue3"
+                                    class="input-field"
+                                    placeholder="-128 ile +127"
+                                    min="-128"
+                                    max="127"
+                                    step="0.1"
+                                    aria-describedby="b-help-3 b-error-3"
+                                >
+                                <div id="b-help-3" class="input-help">Aralık: -128 ile +127</div>
+                                <div id="b-error-3" class="error-message" role="alert" aria-live="polite"></div>
+                            </div>
                         </div>
                     </div>
                     
@@ -102,10 +190,26 @@
                 
                 <div id="results-container" class="results-container" style="display: none;">
                     <div class="result-card">
-                        <div class="result-values">
-                            <div class="ita-value">
-                                <span class="result-label">ITA Değeri:</span>
-                                <span id="ita-result" class="result-number">--</span>
+                        <!-- Individual Measurements -->
+                        <div class="individual-results">
+                            <h3 class="results-subtitle">Bireysel Ölçümler</h3>
+                            <div id="individual-measurements" class="measurement-results">
+                                <!-- Individual measurement results will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Average Result -->
+                        <div class="average-result">
+                            <h3 class="results-subtitle">Ortalama Sonuç</h3>
+                            <div class="result-values">
+                                <div class="ita-value average">
+                                    <span class="result-label">Ortalama ITA:</span>
+                                    <span id="ita-average" class="result-number">--</span>
+                                </div>
+                                <div class="measurement-count">
+                                    <span class="result-label">Ölçüm Sayısı:</span>
+                                    <span id="measurement-count" class="result-text">--</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -134,12 +238,6 @@
             </section>
         </main>
 
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p class="footer-text">
-                Epiderm Color Converter &copy; 2024 - Alexandrite Lazer Uygunluk Değerlendirmesi
-            </p>
-        </footer>
     </div>
 
     <!-- Error Modal -->

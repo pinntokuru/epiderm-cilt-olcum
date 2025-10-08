@@ -69,7 +69,6 @@ class ITACalculator {
         this.errorMessages = {
             invalidL: 'Geçersiz L* değeri - 0 ile 100 arasında bir sayı girin',
             invalidB: 'Geçersiz b* değeri - -128 ile 127 arasında bir sayı girin',
-            zeroBValue: 'b* değeri sıfır olamaz (sıfıra bölme hatası)',
             emptyField: 'Bu alan zorunludur',
             invalidNumber: 'Lütfen geçerli bir sayı girin',
             calculationError: 'Hesaplama hatası - değerlerinizi kontrol edin'
@@ -99,36 +98,21 @@ class ITACalculator {
             const lValue = parseFloat(L);
             const bValue = parseFloat(b);
 
-            // Check for division by zero
-            if (bValue === 0) {
-                return {
-                    success: false,
-                    errors: [this.errorMessages.zeroBValue],
-                    ita: null,
-                    skinType: null
-                };
-            }
-
-            // Calculate ITA using the standard dermatological formula
-            // ITA° = [Arc Tangent ((L* - 50) / b*)] × (180 / π)
+            // Calculate ITA using the robust atan2 formula
+            // ITA° = [Arc Tangent2 ((L* - 50), b*)] × (180 / π)
             //
-            // Handle edge case: For very dark colors (L < 30) with negative b values,
-            // the standard formula can produce incorrect high positive ITA values.
-            // This occurs because both (L-50) and b are negative, resulting in a positive ratio.
-            let itaValue;
+            // Using atan2 instead of atan provides several advantages:
+            // 1. Handles b* = 0 case gracefully (no division by zero)
+            // 2. Maintains correct quadrant information
+            // 3. More mathematically robust for all edge cases
+            // 4. Returns values in the full range [-180°, +180°]
+            //
+            // atan2(y, x) where y = (L* - 50) and x = b*
+            const y = lValue - 50;  // Lightness deviation from neutral (50)
+            const x = bValue;       // Blue-Yellow axis value
             
-            if (lValue < 30 && bValue < 0) {
-                // For very dark colors with negative b, ensure ITA reflects the darkness
-                // Use the absolute value of b to maintain the correct mathematical relationship
-                // but ensure the result indicates dark skin tone
-                const ratio = (lValue - 50) / Math.abs(bValue);
-                const radians = Math.atan(ratio);
-                itaValue = radians * (180 / Math.PI);
-            } else {
-                // Standard calculation for normal cases
-                const radians = Math.atan((lValue - 50) / bValue);
-                itaValue = radians * (180 / Math.PI);
-            }
+            const radians = Math.atan2(y, x);
+            let itaValue = radians * (180 / Math.PI);
 
             // Round to 1 decimal place
             const roundedITA = Math.round(itaValue * 10) / 10;
@@ -152,6 +136,88 @@ class ITACalculator {
                 errors: [this.errorMessages.calculationError],
                 ita: null,
                 skinType: null
+            };
+        }
+    }
+
+    /**
+     * Calculate ITA values for multiple measurements and return individual results plus average
+     * @param {Array} measurements - Array of measurement objects with L and b values
+     * @returns {Object} Calculation result with individual ITAs and average
+     */
+    calculateMultipleITA(measurements) {
+        try {
+            if (!Array.isArray(measurements) || measurements.length === 0) {
+                return {
+                    success: false,
+                    errors: ['En az bir ölçüm gereklidir'],
+                    individualResults: [],
+                    averageITA: null,
+                    measurementCount: 0
+                };
+            }
+
+            const individualResults = [];
+            const validITAs = [];
+            const allErrors = [];
+
+            // Calculate ITA for each measurement
+            measurements.forEach((measurement, index) => {
+                const { L, b } = measurement;
+                const result = this.calculateITA(L, b);
+                
+                const individualResult = {
+                    measurementNumber: index + 1,
+                    labValues: { L, b },
+                    ...result
+                };
+                
+                individualResults.push(individualResult);
+                
+                if (result.success) {
+                    validITAs.push(result.ita);
+                } else {
+                    allErrors.push(`Ölçüm ${index + 1}: ${result.errors.join(', ')}`);
+                }
+            });
+
+            // Check if we have at least one valid measurement
+            if (validITAs.length === 0) {
+                return {
+                    success: false,
+                    errors: ['Geçerli ölçüm bulunamadı'].concat(allErrors),
+                    individualResults: individualResults,
+                    averageITA: null,
+                    measurementCount: measurements.length
+                };
+            }
+
+            // Calculate average ITA
+            const averageITA = validITAs.reduce((sum, ita) => sum + ita, 0) / validITAs.length;
+            const roundedAverageITA = Math.round(averageITA * 10) / 10;
+
+            // Classify skin type based on average
+            const averageSkinType = this.classifySkinType(roundedAverageITA);
+
+            return {
+                success: true,
+                errors: allErrors, // Include any individual measurement errors as warnings
+                individualResults: individualResults,
+                averageITA: roundedAverageITA,
+                averageSkinType: averageSkinType,
+                measurementCount: measurements.length,
+                validMeasurementCount: validITAs.length,
+                timestamp: new Date()
+            };
+
+        } catch (error) {
+            console.error('Multiple ITA Calculation Error:', error);
+            return {
+                success: false,
+                errors: [this.errorMessages.calculationError],
+                individualResults: [],
+                averageITA: null,
+                measurementCount: 0
             };
         }
     }

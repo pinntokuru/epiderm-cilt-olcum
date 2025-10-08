@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITA Atan2 Robust Formula Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .test-case.pass {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .test-case.fail {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .formula-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .formula-box {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+        .formula-box h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 ITA Atan2 Robust Formula Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Cases for b* = 0 (Previously Failed)</h2>
+        <div id="zero-b-tests"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Edge Case Tests</h2>
+        <div id="edge-case-tests"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Normal Value Verification</h2>
+        <div id="normal-tests"></div>
+    </div>
+
+    <div class="formula-comparison">
+        <div class="formula-box">
+            <h4>Old Formula (Division by Zero Issue)</h4>
+            <code>ITA° = atan((L* - 50) / b*) × (180 / π)</code>
+            <p><strong>Problem:</strong> Fails when b* = 0</p>
+        </div>
+        <div class="formula-box">
+            <h4>New Robust Formula (atan2)</h4>
+            <code>ITA° = atan2((L* - 50), b*) × (180 / π)</code>
+            <p><strong>Advantage:</strong> Handles all cases including b* = 0</p>
+        </div>
+    </div>
+
+    <script src="js/calculator.js"></script>
+    <script>
+        // Initialize calculator
+        const calculator = new ITACalculator();
+
+        // Test cases for b* = 0
+        const zeroBTests = [
+            { L: 50, b: 0, expected: 90, description: "Neutral lightness, b*=0 → 90°" },
+            { L: 75, b: 0, expected: 90, description: "Light skin, b*=0 → 90°" },
+            { L: 25, b: 0, expected: -90, description: "Dark skin, b*=0 → -90°" },
+            { L: 100, b: 0, expected: 90, description: "Maximum lightness, b*=0 → 90°" },
+            { L: 0, b: 0, expected: -90, description: "Minimum lightness, b*=0 → -90°" }
+        ];
+
+        // Edge cases
+        const edgeCases = [
+            { L: 50, b: 0.001, expected: 89.9, description: "Very small positive b*", tolerance: 0.2 },
+            { L: 50, b: -0.001, expected: -89.9, description: "Very small negative b*", tolerance: 0.2 },
+            { L: 25, b: -25, expected: -45, description: "Equal negative values", tolerance: 0.1 },
+            { L: 75, b: 25, expected: 45, description: "Equal positive values", tolerance: 0.1 }
+        ];
+
+        // Normal test cases (should match previous results)
+        const normalTests = [
+            { L: 65, b: 15, expected: 45.0, description: "Standard test case" },
+            { L: 30, b: -10, expected: -63.4, description: "Dark skin with negative b*", tolerance: 0.2 },
+            { L: 80, b: 20, expected: 56.3, description: "Light skin with positive b*", tolerance: 0.2 }
+        ];
+
+        function runTest(testCase, containerId) {
+            const result = calculator.calculateITA(testCase.L, testCase.b);
+            const tolerance = testCase.tolerance || 0.1;
+            
+            let passed = false;
+            let actualValue = null;
+            
+            if (result.success) {
+                actualValue = result.ita;
+                passed = Math.abs(actualValue - testCase.expected) <= tolerance;
+            }
+
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${passed ? 'pass' : 'fail'}`;
+            
+            testDiv.innerHTML = `
+                <strong>${testCase.description}</strong><br>
+                Input: L*=${testCase.L}, b*=${testCase.b}<br>
+                Expected: ${testCase.expected}°<br>
+                <div class="result">
+                    ${result.success ? 
+                        `✅ Result: ${actualValue}° (${passed ? 'PASS' : 'FAIL'})` : 
+                        `❌ Error: ${result.errors.join(', ')}`
+                    }
+                </div>
+            `;
+            
+            document.getElementById(containerId).appendChild(testDiv);
+            return passed;
+        }
+
+        // Run all tests
+        let totalTests = 0;
+        let passedTests = 0;
+
+        console.log('🧪 Running ITA Atan2 Robust Formula Tests...');
+
+        // Test b* = 0 cases
+        zeroBTests.forEach(test => {
+            totalTests++;
+            if (runTest(test, 'zero-b-tests')) passedTests++;
+        });
+
+        // Test edge cases
+        edgeCases.forEach(test => {
+            totalTests++;
+            if (runTest(test, 'edge-case-tests')) passedTests++;
+        });
+
+        // Test normal cases
+        normalTests.forEach(test => {
+            totalTests++;
+            if (runTest(test, 'normal-tests')) passedTests++;
+        });
+
+        // Add summary
+        const summary = document.createElement('div');
+        summary.className = 'test-container';
+        summary.innerHTML = `
+            <h2>📊 Test Summary</h2>
+            <p><strong>Total Tests:</strong> ${totalTests}</p>
+            <p><strong>Passed:</strong> ${passedTests}</p>
+            <p><strong>Failed:</strong> ${totalTests - passedTests}</p>
+            <p><strong>Success Rate:</strong> ${((passedTests / totalTests) * 100).toFixed(1)}%</p>
+            ${passedTests === totalTests ? 
+                '<p style="color: green; font-weight: bold;">🎉 All tests passed! The atan2 formula is working correctly.</p>' :
+                '<p style="color: red; font-weight: bold;">⚠️ Some tests failed. Please review the implementation.</p>'
+            }
+        `;
+        document.body.appendChild(summary);
+
+        console.log(`✅ Tests completed: ${passedTests}/${totalTests} passed`);
+    </script>
+</body>
+</html>

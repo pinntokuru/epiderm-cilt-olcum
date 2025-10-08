@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Measurements Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiple Measurements Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Single Measurement</h2>
+        <div id="test1-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Two Measurements</h2>
+        <div id="test2-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Three Measurements</h2>
+        <div id="test3-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Mixed Valid/Invalid Measurements</h2>
+        <div id="test4-result" class="result"></div>
+    </div>
+
+    <script src="js/calculator.js"></script>
+    <script src="js/validator.js"></script>
+    <script>
+        // Initialize calculator and validator
+        const calculator = new ITACalculator();
+        const validator = new InputValidator();
+        
+        function runTests() {
+            // Test 1: Single measurement
+            const test1Measurements = [
+                { L: 65, b: 15 }
+            ];
+            const test1Result = calculator.calculateMultipleITA(test1Measurements);
+            displayResult('test1-result', test1Result, 'Single measurement test');
+            
+            // Test 2: Two measurements
+            const test2Measurements = [
+                { L: 65, b: 15 },
+                { L: 70, b: 20 }
+            ];
+            const test2Result = calculator.calculateMultipleITA(test2Measurements);
+            displayResult('test2-result', test2Result, 'Two measurements test');
+            
+            // Test 3: Three measurements
+            const test3Measurements = [
+                { L: 65, b: 15 },
+                { L: 70, b: 20 },
+                { L: 60, b: 10 }
+            ];
+            const test3Result = calculator.calculateMultipleITA(test3Measurements);
+            displayResult('test3-result', test3Result, 'Three measurements test');
+            
+            // Test 4: Mixed valid/invalid
+            const test4Measurements = [
+                { L: 65, b: 15 },
+                { L: 150, b: 20 }, // Invalid L value
+                { L: 60, b: 10 }
+            ];
+            const test4Result = calculator.calculateMultipleITA(test4Measurements);
+            displayResult('test4-result', test4Result, 'Mixed valid/invalid test');
+        }
+        
+        function displayResult(elementId, result, testName) {
+            const element = document.getElementById(elementId);
+            const className = result.success ? 'success' : 'error';
+            
+            let html = `<strong>${testName}</strong><br>`;
+            html += `Success: ${result.success}<br>`;
+            
+            if (result.success) {
+                html += `Average ITA: ${calculator.formatITAValue(result.averageITA)}<br>`;
+                html += `Measurement Count: ${result.measurementCount}<br>`;
+                html += `Valid Measurements: ${result.validMeasurementCount}<br>`;
+                
+                if (result.individualResults) {
+                    html += '<br><strong>Individual Results:</strong><br>';
+                    result.individualResults.forEach(individual => {
+                        const itaFormatted = individual.success ? 
+                            calculator.formatITAValue(individual.ita) : 'Error';
+                        html += `${individual.measurementNumber}. L:${individual.labValues.L} b:${individual.labValues.b} → ITA:${itaFormatted}<br>`;
+                    });
+                }
+            } else {
+                html += `Errors: ${result.errors.join(', ')}<br>`;
+            }
+            
+            element.innerHTML = html;
+            element.className = `result ${className}`;
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>
