@@ -54,13 +54,11 @@ class UIController {
             // Form elements
             form: document.getElementById('lab-form'),
             lValue: document.getElementById('l-value'),
-            aValue: document.getElementById('a-value'),
             bValue: document.getElementById('b-value'),
             calculateBtn: document.getElementById('calculate-btn'),
             
             // Error elements
             lError: document.getElementById('l-error'),
-            aError: document.getElementById('a-error'),
             bError: document.getElementById('b-error'),
             
             // Results elements
@@ -90,12 +88,10 @@ class UIController {
         
         // Real-time input validation
         this.elements.lValue.addEventListener('input', (e) => this.handleInputChange(e, 'lValue'));
-        this.elements.aValue.addEventListener('input', (e) => this.handleInputChange(e, 'aValue'));
         this.elements.bValue.addEventListener('input', (e) => this.handleInputChange(e, 'bValue'));
         
         // Input sanitization
         this.elements.lValue.addEventListener('blur', (e) => this.handleInputBlur(e, 'lValue'));
-        this.elements.aValue.addEventListener('blur', (e) => this.handleInputBlur(e, 'aValue'));
         this.elements.bValue.addEventListener('blur', (e) => this.handleInputBlur(e, 'bValue'));
         
         // History actions
@@ -233,7 +229,6 @@ class UIController {
     getFormData() {
         return {
             lValue: this.elements.lValue.value,
-            aValue: this.elements.aValue.value,
             bValue: this.elements.bValue.value
         };
     }
@@ -253,7 +248,6 @@ class UIController {
             
             const result = this.calculator.calculateITA(
                 formData.lValue,
-                formData.aValue,
                 formData.bValue
             );
             
@@ -425,7 +419,7 @@ class UIController {
         return `
             <div class="history-item" data-id="${item.id}">
                 <div class="history-item-content">
-                    <div class="history-item-values">${index}. L:${item.labValues.L} a:${item.labValues.a} b:${item.labValues.b} → ITA:${itaFormatted}</div>
+                    <div class="history-item-values">${index}. L:${item.labValues.L} b:${item.labValues.b} → ITA:${itaFormatted}</div>
                 </div>
                 <div class="history-item-timestamp">${timeString}</div>
             </div>
@@ -455,7 +449,7 @@ class UIController {
         this.elements.form.reset();
         
         // Clear validation states
-        ['lValue', 'aValue', 'bValue'].forEach(fieldName => {
+        ['lValue', 'bValue'].forEach(fieldName => {
             const inputElement = this.elements[fieldName];
             const errorElement = this.elements[`${fieldName.charAt(0)}Error`];
             
@@ -479,7 +473,7 @@ class UIController {
         const itaValue = this.elements.itaResult.textContent;
         const formData = this.getFormData();
         
-        const textToCopy = `Lab Değerleri: L*:${formData.lValue} a*:${formData.aValue} b*:${formData.bValue}\nITA: ${itaValue}`;
+        const textToCopy = `Lab Değerleri: L*:${formData.lValue} b*:${formData.bValue}\nITA: ${itaValue}`;
         
         try {
             await navigator.clipboard.writeText(textToCopy);

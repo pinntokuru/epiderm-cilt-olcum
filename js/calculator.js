@@ -68,7 +68,6 @@ class ITACalculator {
         // Turkish error messages
         this.errorMessages = {
             invalidL: 'Geçersiz L* değeri - 0 ile 100 arasında bir sayı girin',
-            invalidA: 'Geçersiz a* değeri - -128 ile 127 arasında bir sayı girin',
             invalidB: 'Geçersiz b* değeri - -128 ile 127 arasında bir sayı girin',
             zeroBValue: 'b* değeri sıfır olamaz (sıfıra bölme hatası)',
             emptyField: 'Bu alan zorunludur',
@@ -80,14 +79,13 @@ class ITACalculator {
     /**
      * Calculate ITA value from Lab color values
      * @param {number} L - Lightness value (0-100)
-     * @param {number} a - Green-Red axis value (-128 to +127)
      * @param {number} b - Blue-Yellow axis value (-128 to +127)
      * @returns {Object} Calculation result with ITA value and validation
      */
-    calculateITA(L, a, b) {
+    calculateITA(L, b) {
         try {
             // Validate input values
-            const validation = this.validateLabValues(L, a, b);
+            const validation = this.validateLabValues(L, b);
             if (!validation.isValid) {
                 return {
                     success: false,
@@ -99,7 +97,6 @@ class ITACalculator {
 
             // Convert to numbers
             const lValue = parseFloat(L);
-            const aValue = parseFloat(a);
             const bValue = parseFloat(b);
 
             // Check for division by zero
@@ -144,7 +141,7 @@ class ITACalculator {
                 errors: [],
                 ita: roundedITA,
                 skinType: skinType,
-                labValues: { L: lValue, a: aValue, b: bValue },
+                labValues: { L: lValue, b: bValue },
                 timestamp: new Date()
             };
 
@@ -197,19 +194,15 @@ class ITACalculator {
     /**
      * Validate Lab color values
      * @param {*} L - Lightness value
-     * @param {*} a - Green-Red axis value
      * @param {*} b - Blue-Yellow axis value
      * @returns {Object} Validation result with errors
      */
-    validateLabValues(L, a, b) {
+    validateLabValues(L, b) {
         const errors = [];
 
         // Check if values are provided
         if (L === null || L === undefined || L === '') {
             errors.push(this.errorMessages.emptyField + ' (L*)');
-        }
-        if (a === null || a === undefined || a === '') {
-            errors.push(this.errorMessages.emptyField + ' (a*)');
         }
         if (b === null || b === undefined || b === '') {
             errors.push(this.errorMessages.emptyField + ' (b*)');
@@ -222,15 +215,11 @@ class ITACalculator {
 
         // Convert to numbers and validate
         const lValue = parseFloat(L);
-        const aValue = parseFloat(a);
         const bValue = parseFloat(b);
 
         // Check if values are valid numbers
         if (isNaN(lValue)) {
             errors.push(this.errorMessages.invalidNumber + ' (L*)');
-        }
-        if (isNaN(aValue)) {
-            errors.push(this.errorMessages.invalidNumber + ' (a*)');
         }
         if (isNaN(bValue)) {
             errors.push(this.errorMessages.invalidNumber + ' (b*)');
@@ -244,9 +233,6 @@ class ITACalculator {
         // Validate ranges
         if (lValue < 0 || lValue > 100) {
             errors.push(this.errorMessages.invalidL);
-        }
-        if (aValue < -128 || aValue > 127) {
-            errors.push(this.errorMessages.invalidA);
         }
         if (bValue < -128 || bValue > 127) {
             errors.push(this.errorMessages.invalidB);
@@ -324,7 +310,7 @@ class ITACalculator {
         }
 
         const { ita, skinType, labValues } = result;
-        return `L:${labValues.L} a:${labValues.a} b:${labValues.b} → ITA:${this.formatITAValue(ita)} (${skinType.fullDescription})`;
+        return `L:${labValues.L} b:${labValues.b} → ITA:${this.formatITAValue(ita)} (${skinType.fullDescription})`;
     }
 }
 

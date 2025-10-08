@@ -11,7 +11,6 @@ class InputValidator {
             invalidNumber: 'Lütfen geçerli bir sayı girin',
             outOfRange: 'Değer geçerli aralık dışında',
             lStarRange: 'L* değeri 0 ile 100 arasında olmalıdır',
-            aStarRange: 'a* değeri -128 ile 127 arasında olmalıdır',
             bStarRange: 'b* değeri -128 ile 127 arasında olmalıdır',
             bStarZero: 'b* değeri sıfır olamaz (sıfıra bölme hatası)',
             tooManyDecimals: 'En fazla 2 ondalık basamak kullanın',
@@ -28,14 +27,6 @@ class InputValidator {
                 max: 100,
                 decimals: 2,
                 allowNegative: false
-            },
-            aValue: {
-                required: true,
-                type: 'number',
-                min: -128,
-                max: 127,
-                decimals: 2,
-                allowNegative: true
             },
             bValue: {
                 required: true,
@@ -154,8 +145,6 @@ class InputValidator {
         switch (fieldName) {
             case 'lValue':
                 return this.messages.lStarRange;
-            case 'aValue':
-                return this.messages.aStarRange;
             case 'bValue':
                 return this.messages.bStarRange;
             default:
@@ -351,8 +340,6 @@ class InputValidator {
         switch (fieldName) {
             case 'lValue':
                 return 'Aralık: 0-100';
-            case 'aValue':
-                return 'Aralık: -128 ile +127';
             case 'bValue':
                 return 'Aralık: -128 ile +127 (sıfır olamaz)';
             default:
